@@ -1,2 +1,2 @@
-data/puzzles/sudoku05.txt
-0................
+data/puzzles/sudoku00.txt
+02..1.13..42.3..4

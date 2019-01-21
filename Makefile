@@ -5,4 +5,4 @@ clean:
 	rm $(OUT)
 
 sudoku:
-	gcc $(SRC) -o $(OUT) `pkg-config gtk+-2.0 --cflags --libs`
+	gcc -w $(SRC) -o $(OUT) `pkg-config --cflags --libs  gtk+-2.0`

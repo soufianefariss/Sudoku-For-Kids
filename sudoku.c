@@ -34,12 +34,12 @@ int selected_x = 0, selected_y = 0, current_sudoku = -1;
 // change grid cell
 static void selection( GtkWidget *widget, gpointer data ) {
   	GdkColor color;
-  	gdk_color_parse("#999999", &color);
+  	gdk_color_parse("#222222", &color); //#999999
 
   	gtk_widget_modify_bg(sudokuw[selected_x][selected_y], GTK_STATE_PRELIGHT, NULL);
 
-  	selected_x = (int)((int*)data)[0];
-  	selected_y = (int)((int*)data)[1];
+  	selected_x = (int) ((int *) data)[0];
+  	selected_y = (int) ((int *) data)[1];
 
   	gtk_widget_modify_bg(sudokuw[selected_x][selected_y], GTK_STATE_PRELIGHT, &color);
   	#ifdef DEBUG
@@ -50,8 +50,8 @@ static void selection( GtkWidget *widget, gpointer data ) {
 // put number in grid cell
 static void put_number( GtkWidget *widget, gpointer data )
 {
-	char *string = (char*)data;
-	if( string[0] == 'X' )
+	char *string = (char *) data;
+	if (string[0] == 'X')
 		string[0] = 0;
 	gtk_button_set_label( GTK_BUTTON( sudokuw[selected_x][selected_y] ), string );
 }
@@ -208,7 +208,11 @@ int main( int argc, char *argv[] ) {
     GtkWidget *bQuit, *bLoad, *bSave, *bNew;						// toolbox buttons
     GtkWidget *vbox, *hbox, *separator, *cmdbox, *toolbox;			// boxes
     GtkWidget *numbers[4];											// numbers buttons
-
+	GtkWidget *align;												// 
+	GtkWidget *label;												// 
+	GtkWidget *halign;												// align management
+	GtkWidget *valign;												//					
+																	//
     int i,j;
     int *data = NULL;
     char num[2] = { 0, '\0' };
@@ -275,8 +279,9 @@ int main( int argc, char *argv[] ) {
     g_signal_connect (bNew, "clicked", G_CALLBACK(new), NULL);
 
     vbox = gtk_vbox_new( FALSE, 0 ); //false
-    gtk_box_pack_start(GTK_BOX(vbox), lTitle, 0,0,5);
+    //gtk_box_pack_start(GTK_BOX(vbox), lTitle, 20,20,55); //0, 0, 5
     gtk_layout_put(GTK_LAYOUT(layout), vbox, 0, 0);
+    
 
     // prepare the grid (with buttons)
     for( i=0; i<4; i++ ) //
@@ -286,25 +291,25 @@ int main( int argc, char *argv[] ) {
     	{
     		sudokuw[i][j] = gtk_button_new();
     		gtk_widget_set_sensitive(sudokuw[i][j], FALSE); // ORG: FALSE
-    		gtk_widget_set_size_request( sudokuw[i][j], GRID_X, GRID_Y );
+    		gtk_widget_set_size_request( sudokuw[i][j], GRID_X, GRID_Y);
     		data = (int*) malloc(sizeof(int)*2);
     		data[0] = i; data[1] = j;
     		g_signal_connect (sudokuw[i][j], "clicked", G_CALLBACK(selection), data);
-    		gtk_box_pack_start(GTK_BOX(hbox), sudokuw[i][j], 0,0,0);
-    		if((j+1) % 2 == 0 && j < 2) // 8 -> 2 / 3 -> 2
+    		gtk_box_pack_start(GTK_BOX(hbox), sudokuw[i][j], 0, 0, 0); // 0 0 0 
+    		if(j + 1 == 2) // 8 -> 2 / 3 -> 2 AND (j+1) % 2 == 0 && j < 2 which means id j is in the middle.
     		{
     			separator = gtk_vseparator_new();
     			gtk_box_pack_start(GTK_BOX(hbox), separator, 0, 0, 5);
     		}
     	}
     	gtk_box_pack_start(GTK_BOX(vbox), hbox, 0, 0, 0);
-    	if( (i+1)%2 == 0 && i<2 )// 8 -> 2 / 3 -> 2
+    	if (i + 1 == 2) // 8 -> 2 / 3 -> 2 AND (i+1)%2 == 0 && i<2
     	{
     		separator = gtk_hseparator_new();
     		gtk_box_pack_start(GTK_BOX(vbox), separator, 0, 0, 5);
     	}
     }
-
+    
     // prepare the number buttons
     cmdbox = gtk_hbox_new( FALSE, 0 );
     for( i = 0; i < 5; i++ )
@@ -323,18 +328,21 @@ int main( int argc, char *argv[] ) {
     }
 
 
-    gtk_box_pack_start(GTK_BOX(vbox), cmdbox, 0, 0, 10 );
+    gtk_box_pack_start(GTK_BOX(vbox), cmdbox, 0, 0, 10); // 0, 0, 10
     gtk_container_add(GTK_CONTAINER(window), vbox);
 
     // prepare the toolbox
     toolbox = gtk_hbox_new( FALSE, 20 );
-    gtk_box_pack_start(GTK_BOX(toolbox), bNew, 0, 0, 5);
-    gtk_box_pack_start(GTK_BOX(toolbox), bSave, 0, 0, 5);
-    gtk_box_pack_start(GTK_BOX(toolbox), bLoad, 0, 0, 5);
-    gtk_box_pack_start(GTK_BOX(toolbox), bQuit, 0, 0, 5);
+    gtk_box_pack_start(GTK_BOX(toolbox), bNew,  0, 0, 20);
+    gtk_box_pack_start(GTK_BOX(toolbox), bSave, 0, 0, 20);
+    gtk_box_pack_start(GTK_BOX(toolbox), bLoad, 0, 0, 20);
+    gtk_box_pack_start(GTK_BOX(toolbox), bQuit, 0, 0, 20);
 
-    gtk_box_pack_start(GTK_BOX(vbox), toolbox, 0, 0, 10 );
-
+    //gtk_box_pack_start(GTK_BOX(vbox), toolbox, 0, 0, 10);// 0, 0, 10
+    
+    gtk_layout_put(GTK_LAYOUT(layout), vbox, 225, 150);
+    gtk_layout_put(GTK_LAYOUT(layout), toolbox, 50, 410 + 50);
+    
     gtk_window_set_title( GTK_WINDOW(window), "C-doku pour enfants");
     gtk_widget_show_all(window);
 
