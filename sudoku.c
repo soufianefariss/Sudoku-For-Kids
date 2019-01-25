@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include <dirent.h>
+#include <mysql/mysql.h>
 
 #define PUZZLE_PATH "data/puzzles"
 #define SAVE_PATH 	"data/saved_sudoku.txt"
@@ -21,6 +22,8 @@
 #define LOAD_BUTTON_TEXT "Load"
 #define SAVE_BUTTON_TEXT "Save"
 #define NEW_BUTTON_TEXT "New"
+
+#define DEBUG
 
 GtkWidget *window;
 static GtkWidget *sudokuw[9][9];
@@ -93,7 +96,7 @@ static void save( GtkWidget *widget, gpointer data )
 static void new( GtkWidget *widget, gpointer data )
 {
 	FILE *sudoku_file = NULL;
-	char path[256];
+	//char path[256];
 	int i,j;
 	char n[2] = { 0, '\0' };
 	char c;
@@ -108,7 +111,7 @@ static void new( GtkWidget *widget, gpointer data )
 		do
 		{
 			file = rand() % sudoku_total_files;
-		}while( file == current_sudoku ); // different from the current one
+		} while( file == current_sudoku ); // different from the current one
 	}
 	else
 	{
