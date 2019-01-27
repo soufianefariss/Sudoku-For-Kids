@@ -1,4 +1,5 @@
 SRC = sudoku.c
+GEN = generator.c
 OUT = sudoku
 
 clean:

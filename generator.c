@@ -150,17 +150,17 @@ void printBoard(char mat[N][N]) {
     printf("\n"); 
 }
 
-void rotateBoard180AntiClockwise(
-							     char board[N][N],
-							     void (*ptrTranspose)(char[N][N]),
-							     void (*ptrRotateBoard180)(char[N][N])
-							     ) 
-{
-	(*ptrTranspose)(board);
-	(*ptrRotateBoard180)(board);
-	(*ptrTranspose)(board);
-	(*ptrRotateBoard180)(board);
-}
+/*void rotateBoard180AntiClockwise(*/
+/*							     char board[N][N],*/
+/*							     void (*ptrTranspose)(char[N][N]),*/
+/*							     void (*ptrRotateBoard180)(char[N][N])*/
+/*							     ) */
+/*{*/
+/*	(*ptrTranspose)(board);*/
+/*	(*ptrRotateBoard180)(board);*/
+/*	(*ptrTranspose)(board);*/
+/*	(*ptrRotateBoard180)(board);*/
+/*}*/
 
 void reverseCols(char board[N][N], char col1, char col2) {
 	int temp;
@@ -257,6 +257,8 @@ char *toString(char init_board[N][N]) {
 	return toStringBoard;
 }
 
+
+// main is basically equivalent to generate();
 int main() {
 	srand(time(NULL));
 	int choose = rand() % 2;
@@ -266,10 +268,7 @@ int main() {
 	else
 		populateBoardWith5(init_board);
 	
-	printf("Initial baord. No changes yet:\n");
-	printBoard(init_board);
-	
-	
+	// seeding the rand fucntion.	
 	srand(time(NULL));
 	
 	int counter, a, b, c, d;
@@ -285,7 +284,11 @@ int main() {
 				rotateBoard180(init_board);
 				break;
 			case 2:
-				rotateBoard180AntiClockwise(init_board, transpose, rotateBoard180);
+				// rotateBoard180AntiClockwise <=> transpose -> rotateBoard180 -> transpose -> rotateBoard180
+				transpose(init_board);
+				rotateBoard180(init_board);
+				transpose(init_board);
+				rotateBoard180(init_board);
 				break;
 			case 3:
 				RND1:a = rand() % 4; 
@@ -315,10 +318,11 @@ int main() {
 		}
 		counter--;
 	} while (counter > 0);
-	//printf("%d %d %d\n", checkSquares(init_board, count) , checkRows(init_board, count) , checkCols(init_board, count));
+
 	if (!(checkSquares(init_board, count) && checkRows(init_board, count) && checkCols(init_board, count)))
 		goto TRY;
 	
+	printf("Random generated board: \n");
 	printBoard(init_board);
 	
 	FILE* current_puzzle_file = fopen(CURRENT_PUZZLE_PATH, "w");
@@ -328,11 +332,8 @@ int main() {
     	return 0;
 	}
 	
-
-	
  	fputs(toString(init_board), current_puzzle_file);
 	fclose(current_puzzle_file);
 	
 	return 0;
-
 }
