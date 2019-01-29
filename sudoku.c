@@ -84,9 +84,6 @@ static void save( GtkWidget *widget, gpointer data ) {
 	FILE *savefile = NULL;
 	int i,  j;
 
-/*	if( current_sudoku == -1 )	// no puzzle to save*/
-/*		return;*/
-
 	savefile = fopen( SAVE_PATH, "w" );
 	if (!savefile)
 		return;
@@ -161,21 +158,92 @@ static void load( GtkWidget *widget, gpointer data ) {
 		for( j=0; j<4; j++ )
 		{
 			c = fgetc(savefile);
+			g_print("c = %c\n", c);
 			if( c != '.' )
 			{
 				label[0] = c;
 				gtk_button_set_label( GTK_BUTTON(sudokuw[i][j]), label );
+				gtk_widget_set_sensitive(sudokuw[i][j], FALSE);
+			}
+			else {
+				gtk_button_set_label( GTK_BUTTON(sudokuw[i][j]), "" );
+				gtk_widget_set_sensitive(sudokuw[i][j], TRUE);
 			}
 		}
 }
 
-static void submit( GtkWidget *widget, gpointer data ) {
-/*	int i, j;*/
-/*	FILE *savefile = fopen(SAVE_PATH, "r" );*/
+int hasDuplicates(int array[4]) {
+	for (int i = 0; i < 4 - 1; i++) {
+		for (int j = i + 1; j < 4; j++) {
+			if (array[i] == array[j]) {
+		        return 1; // 1 means a duplicate is found, quitting..
+		    }
+		}
+	}
+	return 0; // 0 means no duplicates
+}
 
-/*	if(!savefile)*/
-/*		return;*/
-	;
+void transpose(int A[][4], int B[][4]) { 
+    for (int i = 0; i < 4; i++) 
+        for (int j = 0; j < 4; j++) 
+            B[i][j] = A[j][i];
+} 
+
+static void submit(GtkWidget *widget, gpointer data ) {
+	srand(time(NULL));
+	char board[4][4], *sound_effects[6] = {
+							"canberra-gtk-play -f ~/myProject/ressources/sounds/no-1.wav",
+							"canberra-gtk-play -f ~/myProject/ressources/sounds/no-2.wav", 
+							"canberra-gtk-play -f ~/myProject/ressources/sounds/no-3.wav", 
+							"canberra-gtk-play -f ~/myProject/ressources/sounds/no-4.wav", 
+							"canberra-gtk-play -f ~/myProject/ressources/sounds/no-5.wav", 
+							"canberra-gtk-play -f ~/myProject/ressources/sounds/no-6.wav"
+							};
+							
+							
+	for(int i=0; i<4; i++ ) {
+		for(int j=0; j<4; j++ ) {
+				const gchar *c = gtk_button_get_label( GTK_BUTTON(sudokuw[i][j]));
+				if (*c == 0) {
+					char r = rand() % 6;
+					system(sound_effects[r]);
+					return;
+				}
+				board[i][j] = *c;
+		}
+	}
+	
+	for (int row = 0; row < 4; row++) {
+		for (int i = 0; i < 4 - 1; i++) {
+			for (int j = i + 1; j < 4; j++) {
+				if (board[row][i] == board[row][j]) {
+				    char r = rand() % 6;
+					system(sound_effects[r]);
+					return; // means a duplicate is found, quitting..
+				}
+			}
+		}
+	}
+	
+	int transposed[4][4];
+    for (int i = 0; i < 4; i++) 
+        for (int j = 0; j < 4; j++) 
+            transposed[i][j] = board[j][i];
+	
+	// now, check columns... 
+	for (int col = 0; col < 4; col++) {
+		for (int i = 0; i < 4 - 1; i++) {
+			for (int j = i + 1; j < 4; j++) {
+				if (transposed[col][i] == transposed[col][j]) {
+				    char r = rand() % 6;
+					system(sound_effects[r]);
+					return; // means a duplicate is found, quitting..
+				}
+			}
+		}
+	}
+	system("canberra-gtk-play -f ~/myProject/ressources/sounds/Ta-Da.wav");
+	return;
 }
 
 static void top10( GtkWidget *widget, gpointer data ) {
@@ -263,68 +331,6 @@ struct user{
     char username[10];
     char password[10];
 } *pUser;
-
-int userlogin() {
-    FILE *fp;
-    char uName[10], pwd[10];
-    int i;
-    char c;
-
-    pUser = (struct user *) malloc(sizeof(struct user));
-	printf("\n*******************************************************************");
-	printf("\n*                                                                 *");
-	printf("\n*                     Welcome to Sudoku Game                      *");
-	printf("\n*                                                                 *");
-	printf("\n*******************************************************************\n");
-
-    printf("\n\n\t1. Login Through An Existing Account\n\t2. Create New account\n\n\t");
-    scanf("%d",&i);
-    printf("\n");
-    switch(i){
-        case 1:
-            if ( ( fp=fopen("user.dat", "r+")) == NULL) {
-                if ( ( fp=fopen("user.dat", "w+")) == NULL) {
-                    printf ("Could not open file\n");
-                    break;
-                }
-            }
-            printf("\tUsername: ");
-            scanf("%s",&uName);
-            printf("\tPassword: ");
-            scanf("%s",&pwd);
-            while ( fread (pUser, sizeof(struct user), 1, fp) == 1) {
-                if( strcmp ( pUser->username, uName) == 0) {
-                    if( strcmp ( pUser->password, pwd) == 0) {
-                        printf  ("\n\tLogin successful! Welcome.\n");
-                        
-                    }
-                }
-            }
-            break;
-
-        case 2:
-            do
-            {
-                if ( ( fp=fopen("user.dat", "a+")) == NULL) {
-                    if ( ( fp=fopen("user.dat", "w+")) == NULL) {
-                        printf ("Could not open file\n");
-						break;
-                    }
-                }
-                printf("Choose A Username: ");
-                scanf("%s",pUser->username);
-                printf("Choose A Password: ");
-                scanf("%s",pUser->password);
-                fwrite (pUser, sizeof(struct user), 1, fp);
-                printf("\tAdd another account? (Y/N): ");
-                scanf(" %c",&c);
-            } while(c=='Y'||c=='y');
-            
-            break;
-    }
-	free (pUser);
-	fclose(fp);
-}
 
 int main( int argc, char *argv[] ) {
 
@@ -473,7 +479,7 @@ int main( int argc, char *argv[] ) {
     
     bTop10 = gtk_button_new_with_label( TOP10_BUTTON_TEXT );
     gtk_widget_set_size_request( bTop10, TOOL_X, TOOL_Y );
-    g_signal_connect (bSubmit, "clicked", G_CALLBACK(top10), NULL);
+    g_signal_connect (bTop10, "clicked", G_CALLBACK(top10), NULL);
     
     // timer buttons
 /*    label = gtk_label_new("Time elapsed: 0 secs");*/

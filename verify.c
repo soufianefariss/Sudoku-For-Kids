@@ -42,25 +42,32 @@ void transpose(int A[][4], int B[][4]) {
     int i, j; 
     for (i = 0; i < 4; i++) 
         for (j = 0; j < 4; j++) 
-            B[i][j] = A[j][i]; 
+            B[i][j] = A[j][i];
 } 
 
-int main() {
-	printf("\n\nChecking rows...\n");
+int main(int argc, char *argv[]) {
+	
+	int var = 1;
+	for (int row = 0; row < 4; row++) {
+		for (int col = 0; col < 4; col++) {
+			good_board[row][col] = atoi(argv[var++]);
+		}
+		printf("\n"	);
+	}
+
 	print(good_board);
-	// check rows...
+	
+	
 	for (int row = 0; row < 4; row++) {
 		if (hasDuplicates(good_board[row])) {
 			printf("Bad Board\n");
 			return 0;
 		}
 	}
-	// transpose the board so we switch rows with cols
 	
-	printf("\n\nChecking columns...\n");
 	int transposed[4][4];
 	transpose(good_board, transposed);
-	print(transposed);
+	
 	// now, check columns... 
 	for (int col = 0; col < 4; col++) {
 		if (hasDuplicates(transposed[col])){
@@ -69,5 +76,5 @@ int main() {
 		}
 	}
 	printf("Good board!\n");
-	return 0;
+	return 1;
 }
