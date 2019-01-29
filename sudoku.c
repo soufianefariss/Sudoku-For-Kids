@@ -259,12 +259,140 @@ static void _reset_timer (GtkWidget *button, gpointer data)
     start_timer = FALSE;
 }
 
+struct user{
+    char username[10];
+    char password[10];
+} *pUser;
+
+int userlogin() {
+    FILE *fp;
+    char uName[10], pwd[10];
+    int i;
+    char c;
+
+    pUser = (struct user *) malloc(sizeof(struct user));
+	printf("\n*******************************************************************");
+	printf("\n*                                                                 *");
+	printf("\n*                     Welcome to Sudoku Game                      *");
+	printf("\n*                                                                 *");
+	printf("\n*******************************************************************\n");
+
+    printf("\n\n\t1. Login Through An Existing Account\n\t2. Create New account\n\n\t");
+    scanf("%d",&i);
+    printf("\n");
+    switch(i){
+        case 1:
+            if ( ( fp=fopen("user.dat", "r+")) == NULL) {
+                if ( ( fp=fopen("user.dat", "w+")) == NULL) {
+                    printf ("Could not open file\n");
+                    break;
+                }
+            }
+            printf("\tUsername: ");
+            scanf("%s",&uName);
+            printf("\tPassword: ");
+            scanf("%s",&pwd);
+            while ( fread (pUser, sizeof(struct user), 1, fp) == 1) {
+                if( strcmp ( pUser->username, uName) == 0) {
+                    if( strcmp ( pUser->password, pwd) == 0) {
+                        printf  ("\n\tLogin successful! Welcome.\n");
+                        
+                    }
+                }
+            }
+            break;
+
+        case 2:
+            do
+            {
+                if ( ( fp=fopen("user.dat", "a+")) == NULL) {
+                    if ( ( fp=fopen("user.dat", "w+")) == NULL) {
+                        printf ("Could not open file\n");
+						break;
+                    }
+                }
+                printf("Choose A Username: ");
+                scanf("%s",pUser->username);
+                printf("Choose A Password: ");
+                scanf("%s",pUser->password);
+                fwrite (pUser, sizeof(struct user), 1, fp);
+                printf("\tAdd another account? (Y/N): ");
+                scanf(" %c",&c);
+            } while(c=='Y'||c=='y');
+            
+            break;
+    }
+	free (pUser);
+	fclose(fp);
+}
+
 int main( int argc, char *argv[] ) {
+
+	FILE *fp;
+    char uName[10], pwd[10];
+    int var;
+    char c;
+
+    pUser = (struct user *) malloc(sizeof(struct user));
+	printf("\n*******************************************************************");
+	printf("\n*                                                                 *");
+	printf("\n*                     Welcome to Sudoku Game                      *");
+	printf("\n*                                                                 *");
+	printf("\n*******************************************************************\n");
+
+    printf("\n\n\t1. Login Through An Existing Account\n\t2. Create New account\n\n\t");
+    scanf("%d",&var);
+    printf("\n");
+    switch(var) {
+        case 1:
+            if ( ( fp=fopen("user.dat", "r+")) == NULL) {
+                if ( ( fp=fopen("user.dat", "w+")) == NULL) {
+                    printf ("Could not open file\n");
+                    exit(0);
+                }
+            }
+            printf("\tUsername: ");
+            scanf("%s",&uName);
+            printf("\tPassword: ");
+            scanf("%s",&pwd);
+            while ( fread (pUser, sizeof(struct user), 1, fp) == 1) {
+                if( strcmp ( pUser->username, uName) == 0) {
+                    if( strcmp ( pUser->password, pwd) == 0) {
+                        printf  ("\n\tLogin successful! Welcome.\n");
+                        goto BEGIN;
+                    }
+                }
+            }
+            exit(0);
+
+        case 2:
+            do
+            {
+                if ( ( fp=fopen("user.dat", "a+")) == NULL) {
+                    if ( ( fp=fopen("user.dat", "w+")) == NULL) {
+                        printf ("Could not open file\n");
+						exit(0);
+                    }
+                }
+                printf("\tChoose A Username: ");
+                scanf("%s",pUser->username);
+                printf("\tChoose A Password: ");
+                scanf("%s",pUser->password);
+                fwrite (pUser, sizeof(struct user), 1, fp);
+                printf("\tAdd another account? (Y/N): ");
+                scanf(" %c",&c);
+            } while(c=='Y'||c=='y');
+            exit(0);
+    }
+	free (pUser);
+	BEGIN:fclose(fp);
+	
+	
 	GtkWidget *layout; 													// layout
-    GtkWidget *image;												// background image
+    GtkWidget *image;												    // background image
     GtkWidget *lTitle, *label;											// titles & lables
     GtkWidget *bQuit, *bLoad, *bSave, *bNew, *bSubmit, *bTop10;			// toolbox buttons
-    GtkWidget *bStart, *bPause, *bReset;			// timer buttons
+    GtkWidget *bStart, *bPause, *bReset;			                    // timer buttons
     GtkWidget *vbox, *hbox, *separator, *cmdbox, *toolbox, *timerbox;	// boxes
     GtkWidget *numbers[4];												// numbers buttons
 
@@ -272,25 +400,7 @@ int main( int argc, char *argv[] ) {
     int *data = NULL;
     char num[2] = { 0, '\0' };
     char *n = NULL;
-	/*
-    DIR *dir;
-    struct dirent *ep;
-
-    // count sudoku files and save paths to them
-    dir = opendir(PUZZLE_PATH);
-    while( ep = readdir(dir) )
-    {
-    	if( strcmp(ep->d_name, ".") == 0 || strcmp(ep->d_name, "..") == 0 )
-    		continue;
-    	sudoku_files[sudoku_total_files] = (char*)malloc(sizeof(char)*256);
-    	sprintf( sudoku_files[sudoku_total_files], "%s/%s", PUZZLE_PATH, ep->d_name );
-    	#ifdef DEBUG
-    	g_print("%s\n", sudoku_files[sudoku_total_files]);
-    	#endif
-    	sudoku_total_files++;
-    }
-    closedir(dir);
-	*/
+    
     // random seed
     srand(time(NULL));
 
