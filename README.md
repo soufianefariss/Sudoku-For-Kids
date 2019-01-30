@@ -47,7 +47,6 @@ chaque ligne, colonne et région ne doit contenir qu’une seule fois
 l’icône en question. Formulé autrement, chacun de ces ensembles doit
 contenir tous les icônes sans aucune répétition.
 
-![sudoku 4x4[]{data-label="fig:sudoku_board"}](sudoku_board)
 
 l’objectif du projet (Cahier des charges)
 =========================================
@@ -129,15 +128,12 @@ Inscription
 
 *Il est nécessaire de s’inscrire pour pouvoir lancer une partie*.
 
-![Log in[]{data-label="fig:login"}](login.png)
-
 Authentification
 ----------------
 
 *S’il décide de s’inscrire, il doit entrer son identifiant et mot de
 passe choisis*.
 
-![Authentification[]{data-label="fig:sudoku_board"}](auth.png)
 
 *Une fois inscrit, il pourra se connecter en utilisant l’identifiant et
 mot de passe choisis auparavant*.
@@ -367,8 +363,6 @@ static void _pause_resume_timer (GtkWidget *button, gpointer data)
 }
 ```
 
-![Chronomètre[]{data-label="fig:timer"}](timer.png)
-
 Le générateur
 =============
 
@@ -396,14 +390,6 @@ Pour supprimer le projet, exécuter la commande suivante:
   $ make clean
 ```
 
-![image](makefile.png)
-
-Aspect général
-==============
-
-Application finale:
-
-![image](overall.png)
 
 Conclusion
 ==========
