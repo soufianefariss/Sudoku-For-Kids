@@ -51,6 +51,18 @@ static GtkWidget *sudokuw[9][9];
 int sudoku_total_files = 0;
 char *sudoku_files[256];
 
+struct user {
+    char username[10];
+    char password[10];
+    unsigned int score;
+} *pUser;
+
+typedef struct {
+		char uName[10];
+		char pwd[10];
+		int score;
+} userData;	
+
 // grid cell to act on, current sudoku file
 int selected_x = 0, selected_y = 0, current_sudoku = -1;
 
@@ -75,7 +87,7 @@ static void put_number( GtkWidget *widget, gpointer data )
 {
 	char *string = (char *) data;
 	if (string[0] == 'X')
-		string[0] = 0;
+		string[0] = 0x0;
 	gtk_button_set_label( GTK_BUTTON( sudokuw[selected_x][selected_y] ), string );
 }
 
@@ -132,7 +144,6 @@ static void new( GtkWidget *widget, gpointer data)
 			{
 				n[0] = '\0';
 /*				imgg  = gtk_image_new_from_file(NEW_ICON_PATH);*/
-/*				*/
 /*				gtk_layout_put(GTK_LAYOUT(data), imgg, 100, 300);*/
 /*				gtk_widget_show(data);*/
 				gtk_widget_set_sensitive(sudokuw[i][j], TRUE);
@@ -158,7 +169,6 @@ static void load( GtkWidget *widget, gpointer data ) {
 		for( j=0; j<4; j++ )
 		{
 			c = fgetc(savefile);
-			g_print("c = %c\n", c);
 			if( c != '.' )
 			{
 				label[0] = c;
@@ -172,22 +182,6 @@ static void load( GtkWidget *widget, gpointer data ) {
 		}
 }
 
-int hasDuplicates(int array[4]) {
-	for (int i = 0; i < 4 - 1; i++) {
-		for (int j = i + 1; j < 4; j++) {
-			if (array[i] == array[j]) {
-		        return 1; // 1 means a duplicate is found, quitting..
-		    }
-		}
-	}
-	return 0; // 0 means no duplicates
-}
-
-void transpose(int A[][4], int B[][4]) { 
-    for (int i = 0; i < 4; i++) 
-        for (int j = 0; j < 4; j++) 
-            B[i][j] = A[j][i];
-} 
 
 static void submit(GtkWidget *widget, gpointer data ) {
 	srand(time(NULL));
@@ -201,7 +195,7 @@ static void submit(GtkWidget *widget, gpointer data ) {
 							};
 							
 							
-	for(int i=0; i<4; i++ ) {
+	for(int i=0; i<4; i++) {
 		for(int j=0; j<4; j++ ) {
 				const gchar *c = gtk_button_get_label( GTK_BUTTON(sudokuw[i][j]));
 				if (*c == 0) {
@@ -219,7 +213,7 @@ static void submit(GtkWidget *widget, gpointer data ) {
 				if (board[row][i] == board[row][j]) {
 				    char r = rand() % 6;
 					system(sound_effects[r]);
-					return; // means a duplicate is found, quitting..
+					return; // 0 means a duplicate is found, quitting..
 				}
 			}
 		}
@@ -237,13 +231,13 @@ static void submit(GtkWidget *widget, gpointer data ) {
 				if (transposed[col][i] == transposed[col][j]) {
 				    char r = rand() % 6;
 					system(sound_effects[r]);
-					return; // means a duplicate is found, quitting..
+					return; // 0 means a duplicate is found, quitting..
 				}
 			}
 		}
 	}
 	system("canberra-gtk-play -f ~/myProject/ressources/sounds/Ta-Da.wav");
-	return;
+	return; // means good board!
 }
 
 static void top10( GtkWidget *widget, gpointer data ) {
@@ -327,15 +321,12 @@ static void _reset_timer (GtkWidget *button, gpointer data)
     start_timer = FALSE;
 }
 
-struct user{
-    char username[10];
-    char password[10];
-} *pUser;
+
 
 int main( int argc, char *argv[] ) {
 
 	FILE *fp;
-    char uName[10], pwd[10];
+    char uName[10], pwd[10]; int score;
     int var;
     char c;
 
@@ -365,6 +356,7 @@ int main( int argc, char *argv[] ) {
                 if( strcmp ( pUser->username, uName) == 0) {
                     if( strcmp ( pUser->password, pwd) == 0) {
                         printf  ("\n\tLogin successful! Welcome.\n");
+                        printf  ("\n\tScore %d\n", pUser->score);
                         goto BEGIN;
                     }
                 }
@@ -384,14 +376,15 @@ int main( int argc, char *argv[] ) {
                 scanf("%s",pUser->username);
                 printf("\tChoose A Password: ");
                 scanf("%s",pUser->password);
+                pUser->score = 0;
                 fwrite (pUser, sizeof(struct user), 1, fp);
                 printf("\tAdd another account? (Y/N): ");
                 scanf(" %c",&c);
             } while(c=='Y'||c=='y');
             exit(0);
     }
-	free (pUser);
-	BEGIN:fclose(fp);
+	BEGIN:free (pUser);
+	fclose(fp);
 	
 	
 	GtkWidget *layout; 													// layout
@@ -472,7 +465,9 @@ int main( int argc, char *argv[] ) {
 	gtk_container_add(GTK_CONTAINER(eb3), imgg3);
 	gtk_layout_put(GTK_LAYOUT(layout), eb3, 300 + 40 * 20, 480);
 */
-
+	
+	
+	
     bSubmit = gtk_button_new_with_label( SUBMIT_BUTTON_TEXT );
     gtk_widget_set_size_request( bSubmit, TOOL_X, TOOL_Y );
     g_signal_connect (bSubmit, "clicked", G_CALLBACK(submit), NULL);
@@ -481,13 +476,11 @@ int main( int argc, char *argv[] ) {
     gtk_widget_set_size_request( bTop10, TOOL_X, TOOL_Y );
     g_signal_connect (bTop10, "clicked", G_CALLBACK(top10), NULL);
     
-    // timer buttons
-/*    label = gtk_label_new("Time elapsed: 0 secs");*/
-/*    gtk_widget_modify_font (GtkWidget *widget, PangoFontDescription *font_desc);*/
-/*    	*/
-    label = gtk_label_new(NULL);
     
-        
+    
+    // timer buttons
+    label = gtk_label_new(NULL);
+
     bStart = gtk_button_new_with_label("Start");
     gtk_widget_set_size_request( bStart, TOOL_X, TOOL_Y );
     g_signal_connect(G_OBJECT(bStart), "clicked", G_CALLBACK(_start_timer), label);
@@ -507,7 +500,7 @@ int main( int argc, char *argv[] ) {
     
 
     // prepare the grid (with buttons)
-    for( i=0; i<4; i++ ) //
+    for( i=0; i<4; i++ )
     {
     	hbox = gtk_hbox_new( FALSE, 0 );
     	for( j=0; j<4; j++ )
@@ -579,11 +572,14 @@ int main( int argc, char *argv[] ) {
     g_timeout_add_seconds(1, _label_update, label);
     continue_timer = TRUE;
     start_timer = TRUE;
-
+	
+	
+	//fclose(fp);
+	
     gtk_button_set_image (GTK_BUTTON(bNew), imgg);
     gtk_window_set_title( GTK_WINDOW(window), "C-doku pour enfants");
     gtk_widget_show_all(window);
-	
+
     gtk_main();
     return 0;
 }
