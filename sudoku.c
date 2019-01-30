@@ -7,8 +7,6 @@
 #include <dirent.h>
 #include <mysql/mysql.h>
 
-// TODO: SOUND!! // LOAD BUTTON STILL HAS PROBLEMS
-
 
 #define PUZZLE_PATH				     	"data/puzzles"
 #define SAVE_PATH 						"data/saved_sudoku.txt"
@@ -17,20 +15,14 @@
 #define	FOUR_BOX_PUZZLES_FILE_PATH		"data/puzzles/4boxes.txt"
 #define	FIVE_BOX_PUZZLES_FILE_PATH		"data/puzzles/5boxes.txt"
 
-#define NEW_ICON_PATH 					"ressources/icons/new.png"
-#define SAVE_ICON_PATH 					"ressources/icons/save.png"
-#define LOAD_ICON_PATH 					"ressources/icons/load.png"
-#define SUBMIT_ICON_PATH 				"ressources/icons/submit.png"
-#define TOP10_ICON_PATH					"ressources/icons/top10.png"
-#define QUIT_ICON_PATH 					"ressources/icons/quit.png"
 
 
-#define GRID_X 		57
-#define GRID_Y 		57
-#define CMD_X 		50
-#define CMD_Y 		50 
-#define TOOL_X 		70
-#define TOOL_Y 		50
+#define GRID_X 							57
+#define GRID_Y 							57
+#define CMD_X 							50
+#define CMD_Y 							50 
+#define TOOL_X 							70
+#define TOOL_Y 							50
 
 #define APPLICATION_TITLE 				"C-doku Pour Enfants"
 #define QUIT_BUTTON_TEXT 				"Quit"
@@ -43,13 +35,11 @@
 
 #define	DEBUG
 
-GtkWidget *imgg, *imgg2, *imgg3, *imgg4, *imgg5;
-
 GtkWidget *window;
 static GtkWidget *sudokuw[9][9];
 
-int sudoku_total_files = 0;
-char *sudoku_files[256];
+/*int sudoku_total_files = 0;*/
+/*char *sudoku_files[256];*/
 
 struct user {
     char username[10];
@@ -60,7 +50,6 @@ struct user {
 typedef struct {
 		char uName[10];
 		char pwd[10];
-		int score;
 } userData;	
 
 // grid cell to act on, current sudoku file
@@ -82,16 +71,37 @@ static void selection( GtkWidget *widget, gpointer data ) {
   	#endif
 }
 
-// put number in grid cell
+/*
+*************************************************
+*                                               *
+*  put_number: put number in grid cell          *
+*  @param: - widget -> c'est la case à remplir. *
+*          - data -> gpointer                   *
+*  @output: void                                *
+*                                               *
+*************************************************
+*/
+
 static void put_number( GtkWidget *widget, gpointer data )
 {
-	char *string = (char *) data;
-	if (string[0] == 'X')
-		string[0] = 0x0;
-	gtk_button_set_label( GTK_BUTTON( sudokuw[selected_x][selected_y] ), string );
+	char *string = (char*)data;
+	if( string[0] == 'X' ){
+		gtk_button_set_label( GTK_BUTTON( sudokuw[selected_x][selected_y] ), string); 
+	}
+	else
+		gtk_button_set_label( GTK_BUTTON( sudokuw[selected_x][selected_y] ), string );
 }
 
-// save current puzzle progress
+/*
+*************************************************
+*                                               *
+*  SAVE: suavegarde la grille actuelle          *
+*  @param: - widget -> c'est le button bSave.   *
+*          - data -> gpointer                   *
+*  @output: void                                *
+*                                               *
+*************************************************
+*/
 static void save( GtkWidget *widget, gpointer data ) {
 	FILE *savefile = NULL;
 	int i,  j;
@@ -100,7 +110,6 @@ static void save( GtkWidget *widget, gpointer data ) {
 	if (!savefile)
 		return;
 
-	//fprintf( savefile, "%s\n0", sudoku_files[current_sudoku] );
 
 	for( i=0; i<4; i++ ) {
 		for( j=0; j<4; j++ ) {
@@ -115,7 +124,16 @@ static void save( GtkWidget *widget, gpointer data ) {
 	fclose( savefile );
 }
 
-// start a new random sudoku
+/*
+*************************************************
+*                                               *
+*  NEW: ce button génere une grille aléatoire.  *
+*  @param: - widget -> c'est le button bNew.    *
+*          - data -> gpointer                   *
+*  @output: void                                *
+*                                               *
+*************************************************
+*/
 static void new( GtkWidget *widget, gpointer data)
 {	
 	
@@ -127,11 +145,11 @@ static void new( GtkWidget *widget, gpointer data)
 	GdkColor color;
 	gdk_color_parse( "#eeeeee", &color );
 	
-	system("generator"); // I present to you the magical, the one and only: the SYSTEM() function <3 <3.
+	system("generator"); // exécute le fichier generator.exe
 	
 	sudoku_file = fopen(CURRENT_PUZZLE_PATH, "r" );
 	
-	// fill the grid
+	// Remplissage de la grille
 	for( i = 0; i < 4; i++ ) {
 		for( j = 0; j < 4; j++ ) {
 			c = fgetc(sudoku_file);
@@ -143,18 +161,25 @@ static void new( GtkWidget *widget, gpointer data)
 			else
 			{
 				n[0] = '\0';
-/*				imgg  = gtk_image_new_from_file(NEW_ICON_PATH);*/
-/*				gtk_layout_put(GTK_LAYOUT(data), imgg, 100, 300);*/
-/*				gtk_widget_show(data);*/
 				gtk_widget_set_sensitive(sudokuw[i][j], TRUE);
 				gtk_widget_modify_bg( sudokuw[i][j], GTK_STATE_NORMAL, &color );
 			}
 			gtk_button_set_label( GTK_BUTTON(sudokuw[i][j]), n );
-			//gtk_button_set_image (GTK_BUTTON(sudokuw[i][j]), imgg);
 		}
 	}
 	fclose(sudoku_file);
 }
+
+/*
+*************************************************
+*                                               *
+*  LOAD: Ce button import le progress.          *
+*  @param: - widget -> c'est le button bLoad.   *
+*          - data -> gpointer                   *
+*  @output: void                                *
+*                                               *
+*************************************************
+*/
 
 // load saved puzzle progress
 static void load( GtkWidget *widget, gpointer data ) {
@@ -182,7 +207,15 @@ static void load( GtkWidget *widget, gpointer data ) {
 		}
 }
 
-
+/*
+*************************************************
+*                                               *
+*  SUBMIT: Ce button vérifie votre résultat.    *
+*  @param: widget -> c'est le button bSubmit    *
+*  @output: void                                *
+*                                               *
+*************************************************
+*/
 static void submit(GtkWidget *widget, gpointer data ) {
 	srand(time(NULL));
 	char board[4][4], *sound_effects[6] = {
@@ -207,6 +240,7 @@ static void submit(GtkWidget *widget, gpointer data ) {
 		}
 	}
 	
+	// check rows for duplicates
 	for (int row = 0; row < 4; row++) {
 		for (int i = 0; i < 4 - 1; i++) {
 			for (int j = i + 1; j < 4; j++) {
@@ -245,7 +279,15 @@ static void top10( GtkWidget *widget, gpointer data ) {
 }
 
 
-// quit
+/*
+*************************************************
+*                                               *
+*  SUBMIT: Ce button sert à quitter le jeu.     *
+*  @param: widget -> c'est le button bQuit      *
+*  @output: void                                *
+*                                               *
+*************************************************
+*/
 static void quit( GtkWidget *widget, gpointer data )
 {
   	gtk_main_quit();
@@ -261,6 +303,15 @@ static void destroy( GtkWidget *widget, gpointer data )
   	gtk_main_quit();
 }
 
+/*
+*************************************************
+*                                               *
+*  Chronomètre: Cet suite d'instruction sert à  *
+*				un chronomètre.					*
+*                                               *
+*************************************************
+*/
+
 /* Determines if to continue the timer or not */
 static gboolean continue_timer = FALSE;
 
@@ -270,6 +321,8 @@ static gboolean start_timer = FALSE;
 /* Display seconds expired */
 static int sec_expired = 0;
 
+
+/* This function updates the label of time. */
 static gboolean _label_update(gpointer data)
 {
 	GtkLabel *label = (GtkLabel*)data;
@@ -280,7 +333,7 @@ static gboolean _label_update(gpointer data)
 	return continue_timer;
 
 }
-
+/* This function checks if start_timer is TRUE */
 static void _start_timer (GtkWidget *button, gpointer data)
 {
     (void) button; /*Avoid compiler warnings*/
@@ -306,7 +359,7 @@ static void _pause_resume_timer (GtkWidget *button, gpointer data)
         }
         else
         {
-            /*Decrementing because timer will be hit one more time before expiring*/
+            /* Decrementing because timer will be hit one more time before expiring */
             sec_expired--;
         }
     }
@@ -326,7 +379,7 @@ static void _reset_timer (GtkWidget *button, gpointer data)
 int main( int argc, char *argv[] ) {
 
 	FILE *fp;
-    char uName[10], pwd[10]; int score;
+    char uName[10], pwd[10];
     int var;
     char c;
 
@@ -356,7 +409,6 @@ int main( int argc, char *argv[] ) {
                 if( strcmp ( pUser->username, uName) == 0) {
                     if( strcmp ( pUser->password, pwd) == 0) {
                         printf  ("\n\tLogin successful! Welcome.\n");
-                        printf  ("\n\tScore %d\n", pUser->score);
                         goto BEGIN;
                     }
                 }
@@ -376,7 +428,6 @@ int main( int argc, char *argv[] ) {
                 scanf("%s",pUser->username);
                 printf("\tChoose A Password: ");
                 scanf("%s",pUser->password);
-                pUser->score = 0;
                 fwrite (pUser, sizeof(struct user), 1, fp);
                 printf("\tAdd another account? (Y/N): ");
                 scanf(" %c",&c);
@@ -386,6 +437,9 @@ int main( int argc, char *argv[] ) {
 	BEGIN:free (pUser);
 	fclose(fp);
 	
+	/*
+		Declaratrion des variables
+	*/
 	
 	GtkWidget *layout; 													// layout
     GtkWidget *image;												    // background image
@@ -404,12 +458,13 @@ int main( int argc, char *argv[] ) {
     srand(time(NULL));
 
     gtk_init( &argc, &argv );
-
+	// declaration de main Window
     window = gtk_window_new( GTK_WINDOW_TOPLEVEL );
     gtk_window_set_default_size(GTK_WINDOW(window), 700, 680);
     gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 	gtk_window_set_resizable (GTK_WINDOW(window), TRUE);
 	
+	// layout + background
 	layout = gtk_layout_new(NULL, NULL);
     gtk_container_add(GTK_CONTAINER (window), layout);
     gtk_widget_show(layout);
@@ -422,7 +477,8 @@ int main( int argc, char *argv[] ) {
     gtk_container_set_border_width(GTK_CONTAINER(window), 0);
     
     lTitle = gtk_label_new( APPLICATION_TITLE );
-
+	
+	/* Déclaration des button. */
     bQuit = gtk_button_new_with_label( QUIT_BUTTON_TEXT );
     gtk_widget_set_size_request( bQuit, TOOL_X, TOOL_Y );
     g_signal_connect (bQuit, "clicked", G_CALLBACK(quit), NULL);
@@ -438,34 +494,6 @@ int main( int argc, char *argv[] ) {
     bNew = gtk_button_new_with_label( NEW_BUTTON_TEXT );
     gtk_widget_set_size_request( bNew, TOOL_X, TOOL_Y );
     g_signal_connect (bNew, "clicked", G_CALLBACK(new), NULL);
-	
-	
-/*	
-	GtkWidget *eb1 = gtk_event_box_new();
-	gtk_widget_add_events (eb1, GDK_BUTTON_PRESS_MASK);
-	gtk_container_add(GTK_CONTAINER(window), eb1);
-	imgg  = gtk_image_new_from_file(NEW_ICON_PATH);
-	g_signal_connect (G_OBJECT(eb1), "button_press_event", G_CALLBACK(new), NULL);
-	gtk_container_add(GTK_CONTAINER(eb1), imgg);
-	gtk_layout_put(GTK_LAYOUT(layout), eb1, 300, 480);
-	
-	GtkWidget *eb2 = gtk_event_box_new();
-	gtk_widget_add_events (eb2, GDK_BUTTON_PRESS_MASK);
-	gtk_container_add(GTK_CONTAINER(window), eb2);
-	imgg2  = gtk_image_new_from_file(SAVE_ICON_PATH);
-	g_signal_connect (G_OBJECT(eb2), "button_press_event", G_CALLBACK(save), NULL);
-	gtk_container_add(GTK_CONTAINER(eb2), imgg2);
-	gtk_layout_put(GTK_LAYOUT(layout), eb2, 300 + 40, 480);
-	
-	GtkWidget *eb3 = gtk_event_box_new();
-	gtk_widget_add_events (eb3, GDK_BUTTON_PRESS_MASK);
-	gtk_container_add(GTK_CONTAINER(window), eb3);
-	imgg3  = gtk_image_new_from_file(LOAD_ICON_PATH);
-	g_signal_connect (G_OBJECT(eb3), "button_press_event", G_CALLBACK(load), NULL);
-	gtk_container_add(GTK_CONTAINER(eb3), imgg3);
-	gtk_layout_put(GTK_LAYOUT(layout), eb3, 300 + 40 * 20, 480);
-*/
-	
 	
 	
     bSubmit = gtk_button_new_with_label( SUBMIT_BUTTON_TEXT );
@@ -533,7 +561,7 @@ int main( int argc, char *argv[] ) {
     	if( i == 4 )
     		num[0] = 'X';
     	else
-    		num[0] = 0x31+i;
+    		num[0] = 0x31 + i;
     	numbers[i] = gtk_button_new_with_label(num);
     	gtk_widget_set_size_request( numbers[i], CMD_X, CMD_Y);
     	gtk_box_pack_start(GTK_BOX(cmdbox), numbers[i], 0, 0, 5);
@@ -576,7 +604,6 @@ int main( int argc, char *argv[] ) {
 	
 	//fclose(fp);
 	
-    gtk_button_set_image (GTK_BUTTON(bNew), imgg);
     gtk_window_set_title( GTK_WINDOW(window), "C-doku pour enfants");
     gtk_widget_show_all(window);
 
