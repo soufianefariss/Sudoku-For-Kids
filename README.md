@@ -1,12 +1,12 @@
 ---
 author:
 - |
-    Soufiane FARISS
+    **Soufiane FARISS**
     soufiane.fariss@um5s.net.ma
     Université Mohammed V
     ENSIAS
 - |
-    Ismail FATRI\
+    **Ismail FATRI**
     ismailfatri@gmail.com
     Université Mohammed V
     ENSIAS
