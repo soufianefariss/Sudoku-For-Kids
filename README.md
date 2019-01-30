@@ -1,14 +1,14 @@
 ---
 author:
 - |
-    Soufiane FARISS\
-    `soufiane.fariss@um5s.net.ma`\
-    Université Mohammed V\
+    Soufiane FARISS
+    soufiane.fariss@um5s.net.ma
+    Université Mohammed V
     ENSIAS
 - |
     Ismail FATRI\
-    `ismailfatri@gmail.com`\
-    Université Mohammed V\
+    ismailfatri@gmail.com
+    Université Mohammed V
     ENSIAS
 date: Janvier 2019
 title: 'C-doku pour enfants'
