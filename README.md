@@ -1,5 +1,5 @@
 ---
-author:
+authors:
 - |
     **Soufiane FARISS**
     soufiane.fariss@um5s.net.ma
@@ -27,13 +27,7 @@ nous.
 
 **Encadrant: Mr. A. EL FAKER.**
 
-\
 
-**Soufiane FARISS**
-
-**Ismail FATRI**
-
-Cette page a été intentionnellement laissée vierge.
 
 Introduction
 ============
@@ -402,7 +396,3 @@ formation, mais aussi de nous familiariser avec la bibliothèque utilisée
 GTK. En plus d’être un projet pédagogique il est aussi ludique et nous a
 donné beaucoup de liberté dans le code et dans la conception.
 
-License
-=======
-
-Copyright (c) 2019 github.com/soufianefariss
